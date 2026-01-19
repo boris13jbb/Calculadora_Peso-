@@ -704,4 +704,133 @@
 
         if (imc < 18.5) {
             estado = "Bajo peso";
-            recomendacion = "Se recomienda consultar con un nut
+            recomendacion = "Se recomienda consultar con un nutricionista para desarrollar un plan de alimentación balanceado que te ayude a alcanzar un peso saludable.";
+        } else if (imc < 25) {
+            estado = "Peso normal";
+            recomendacion = "¡Excelente! Mantén tus hábitos saludables de alimentación y ejercicio regular para conservar tu peso ideal.";
+        } else if (imc < 30) {
+            estado = "Sobrepeso";
+            recomendacion = "Considera incorporar actividad física regular y mejorar tus hábitos alimenticios. Una consulta con un profesional puede ayudarte.";
+        } else {
+            estado = "Obesidad";
+            recomendacion = "Es importante consultar con un médico o nutricionista para desarrollar un plan personalizado de salud y bienestar.";
+        }
+
+        const pesoMin = 18.5 * (estatura * estatura);
+        const pesoMax = 24.9 * (estatura * estatura);
+        const pesoIdeal = (pesoMin + pesoMax) / 2;
+
+        let alertHtml = "";
+        let alertClass = "";
+        let alertIcon = "";
+        
+        if (peso > pesoMax) {
+            const exceso = peso - pesoMax;
+            const porcentaje = ((exceso / pesoMax) * 100).toFixed(1);
+            alertClass = "alert-warning";
+            alertIcon = "📊";
+            alertHtml = `
+                <div class="alert ${alertClass}">
+                    <span class="alert-icon">${alertIcon}</span>
+                    <div><strong>Peso por encima del rango:</strong> ${exceso.toFixed(1)} kg (${porcentaje}%) sobre el límite saludable</div>
+                </div>
+            `;
+        } else if (peso < pesoMin) {
+            const falta = pesoMin - peso;
+            const porcentaje = ((falta / pesoMin) * 100).toFixed(1);
+            alertClass = "alert-warning";
+            alertIcon = "📊";
+            alertHtml = `
+                <div class="alert ${alertClass}">
+                    <span class="alert-icon">${alertIcon}</span>
+                    <div><strong>Peso por debajo del rango:</strong> ${falta.toFixed(1)} kg (${porcentaje}%) bajo el mínimo saludable</div>
+                </div>
+            `;
+        } else {
+            alertClass = "alert-success";
+            alertIcon = "✅";
+            alertHtml = `
+                <div class="alert ${alertClass}">
+                    <span class="alert-icon">${alertIcon}</span>
+                    <div><strong>¡Felicitaciones!</strong> Tu peso está dentro del rango saludable ideal</div>
+                </div>
+            `;
+        }
+
+        const diferenciaPesoIdeal = (peso - pesoIdeal).toFixed(1);
+        const signo = diferenciaPesoIdeal > 0 ? '+' : '';
+
+        const imcPorcentaje = Math.min(100, Math.max(0, ((imc - imcMin) / (imcMax - imcMin)) * 100));
+
+        resultado.className = "resultado show";
+        resultado.innerHTML = `
+            <div class="metric-card">
+                <div class="metric-label">Tu Índice de Masa Corporal</div>
+                <div class="metric-value">${imc.toFixed(1)}</div>
+                <span class="status-badge">${estado}</span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Peso Actual</div>
+                    <div class="stat-value">${peso.toFixed(1)} <span class="stat-unit">kg</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Peso Ideal</div>
+                    <div class="stat-value">${pesoIdeal.toFixed(1)} <span class="stat-unit">kg</span></div>
+                </div>
+            </div>
+
+            <div class="range-card">
+                <div class="range-title">Rango de Peso Saludable</div>
+                <div class="range-values">
+                    <span class="range-value">${pesoMin.toFixed(1)}</span>
+                    <span class="range-separator">—</span>
+                    <span class="range-value">${pesoMax.toFixed(1)}</span>
+                    <span class="stat-unit">kg</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${Math.min(100, Math.max(0, ((peso - pesoMin) / (pesoMax - pesoMin)) * 100))}%"></div>
+                </div>
+            </div>
+
+            <div class="range-card">
+                <div class="chart-title">Escala de IMC</div>
+                <div class="imc-scale">
+                    <div class="imc-marker" style="left: ${imcPorcentaje}%">
+                        <div class="marker-circle"></div>
+                        <div class="marker-pin"></div>
+                    </div>
+                </div>
+                <div class="scale-labels">
+                    <span>Bajo<br>< 18.5</span>
+                    <span>Normal<br>18.5-24.9</span>
+                    <span>Sobrepeso<br>25-29.9</span>
+                    <span>Obesidad<br>≥ 30</span>
+                </div>
+            </div>
+
+            ${alertHtml}
+
+            <div class="recommendation">
+                <div class="recommendation-title">
+                    💡 Recomendación Personalizada
+                </div>
+                <div class="recommendation-text">
+                    ${recomendacion}
+                </div>
+            </div>
+        `;
+    }
+
+    document.getElementById("peso").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") calcular();
+    });
+
+    document.getElementById("estatura").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") calcular();
+    });
+</script>
+
+</body>
+</html>
